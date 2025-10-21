@@ -98,7 +98,7 @@ Output is formatted in Markdown and saved automatically to Notion.
 
 ## 🌍 Credits
 Built by **Julian Reeves – Founder of Chosen Labs**  
-Join the **AI Accelerator Community** → [Skool: The AI Entrepreneur Circle](https://www.skool.com/the-ai-entrepreneur-circle)
+Join the **AI Accelerator Community** → [Skool: The AI Entrepreneur Circle]([https://www.skool.com/the-ai-entrepreneur-circle](https://www.skool.com/the-ai-entrepreneur-circle-5658/about?ref=d0277aefba6d45ac9438d6e9355ba9af))
 
 ---
 
