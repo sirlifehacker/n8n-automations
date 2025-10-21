@@ -54,7 +54,7 @@
           "parameters": [
             {
               "name": "X-Api-Key",
-              "value": "[add you"
+              "value": "[add your apollo api key here]"
             }
           ]
         },
@@ -81,7 +81,7 @@
           "parameters": [
             {
               "name": "X-Api-Key",
-              "value": "dEZqwMqknM7Y3_Rj76Nb4w"
+              "value": "[add your apollo api key here]"
             }
           ]
         },
@@ -108,7 +108,7 @@
           "parameters": [
             {
               "name": "X-Api-Key",
-              "value": "ZZ2LnRnazSo1zkGq-hGFdA"
+              "value": "[add your apollo api key here]"
             }
           ]
         },
