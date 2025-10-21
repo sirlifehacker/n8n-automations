@@ -1,0 +1,886 @@
+{
+  "name": "Linkedin Jobs Scraping + Decision Maker Research",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "[go to api -> api endpoints in apify]",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"publishedAt\": \"r604800\",\n    \"saveOnlyUniqueItems\": false,\n    \"startUrls\": [\n        {\n            \"url\": \"https://www.linkedin.com/jobs/search/?currentJobId=4266807332&f_E=4&f_SB2=4&f_TPR=r604800&geoId=102748797&keywords=superintendent%20construction&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true&sortBy=R&spellCorrectionEnabled=true\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2d16a463-12b6-4012-ac6a-3d2c0ff6578d",
+      "name": "Linkedin Job Scraper"
+    },
+    {
+      "parameters": {
+        "content": "## Linkedin Jobs Scraper\n [Apify Scraper Link](https://apify.com/cheap_scraper/linkedin-job-scraper)"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -320
+      ],
+      "id": "917cb61f-9398-4823-bdbc-97f59310925c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1712,
+        -80
+      ],
+      "id": "04d5e0ce-8a09-450e-99ef-73a829a54727",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apollo.io/v1/organizations/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "[add you"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"q_organization_name\": \"{{ $json.name }}\",\n  \"page\": 1,\n  \"per_page\": 5\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        -64
+      ],
+      "id": "e5073d88-f9cf-44e6-a03b-c990f5263ea3",
+      "name": "Apollo Organization Search"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apollo.io/api/v1/mixed_people/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "dEZqwMqknM7Y3_Rj76Nb4w"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"organization_ids\": [\"{{ $json.organizations[0].id }}\"],\n  \"organization_domains\": [\"{{ $json.organizations[0].primary_domain }}\"],\n\n  \"person_titles\": [\n    \"HR\",\n    \"Recruiting\",\n    \"Sourcing\",\n    \"Talent\",\n    \"Operations\",\n    \"People\",\n    \"Acquisition\",\n    \"Project\",\n    \"Staffing\"\n  ],\n\n  \"page\": 1,\n  \"per_page\": 100,\n\n  \"contact_email_status\": [\"verified\"],\n  \"contact_phone_status\": [\"verified\", \"unverified\"]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2224,
+        -64
+      ],
+      "id": "32b827ed-b2ff-45a4-9a20-881711fde010",
+      "name": "Apollo People Search"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apollo.io/api/v1/people/match",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "ZZ2LnRnazSo1zkGq-hGFdA"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"first_name\": \"={{ $json.name.split(' ')[0] }}\",\n  \"last_name\": \"={{ $json.name.split(' ').slice(1).join(' ') }}\",\n  \"linkedin_url\": \"={{ $json.linkedin }}\",\n  \"organization_name\": \"={{ $node['Get Jobs from Notion'].json.name }}\",\n  \"reveal_personal_emails\": true,\n  \"reveal_phone_number\": false\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2672,
+        -64
+      ],
+      "id": "b4c77e30-3b98-4ce3-9f6b-9363cfe2351d",
+      "name": "Apollo Enrichment"
+    },
+    {
+      "parameters": {
+        "content": "## Decision Maker Finder\n[Apollo API Documentation](https://docs.apollo.io/)"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1216,
+        -368
+      ],
+      "typeVersion": 1,
+      "id": "b35835cb-d7db-4f37-a686-6f4b8af7fcde",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "amount": 25
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3296,
+        -64
+      ],
+      "id": "4b61246f-ef53-4761-8972-089fccdc9217",
+      "name": "Wait",
+      "webhookId": "289d462c-0b5d-4cf1-8177-745099c787df"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "28655c8e-c066-8060-83db-ff94ebed797e",
+          "mode": "list",
+          "cachedResultName": "Lucid Lead Database",
+          "cachedResultUrl": "https://www.notion.so/28655c8ec066806083dbff94ebed797e"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4320,
+        -16
+      ],
+      "id": "2aa69bbf-4cbd-4126-9057-641032840ccf",
+      "name": "Get many database pages1",
+      "credentials": {
+        "notionApi": {
+          "id": "8W7fGjc0h1cJbiGi",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4528,
+        -16
+      ],
+      "id": "15ba222c-1466-43df-93ce-21625edd8e17",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {
+          "maxTokens": 4000,
+          "timeout": 120000,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        5040,
+        224
+      ],
+      "id": "3422d02c-ba72-4a2f-b9f6-f9475108d903",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "CO5ZWvH8mlqFZ8b3",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Take the \"output\" field from the AI Agent\nconst text = $input.first().json.output\n\n// Split by double line breaks\nconst chunks = text.split(/\\n\\n/);\n\n// Return each chunk as a new item\nreturn chunks.map(c => ({ chunk: c }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5440,
+        0
+      ],
+      "id": "24cff017-18aa-453e-a34f-ad2e9eb2d125",
+      "name": "Formatting"
+    },
+    {
+      "parameters": {
+        "content": "## Lead Deep Research\n[Linkedin Profile Scraper](https://apify.com/dev_fusion/linkedin-profile-scraper)"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3936,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "ffd6e39a-9b88-444b-8242-b95b9630b785",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "13233380-34db-488b-b270-1e3bdfceef60",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "28555c8e-c066-807f-80fd-fd062edbe9d8",
+          "mode": "list",
+          "cachedResultName": "Lucid Group Sales Database",
+          "cachedResultUrl": "https://www.notion.so/28555c8ec066807f80fdfd062edbe9d8"
+        },
+        "title": "Lucid Group Sales Database",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Company Linkedin URL|url",
+              "urlValue": "={{ $json.companyUrl }}"
+            },
+            {
+              "key": "Company Name|title",
+              "title": "={{ $json.companyName }}"
+            },
+            {
+              "key": "Job Description |rich_text",
+              "textContent": "={{ $json.jobDescriptionPreview }}"
+            },
+            {
+              "key": "Job Title|rich_text",
+              "textContent": "={{ $json.jobTitle }}"
+            },
+            {
+              "key": "Job URL|url",
+              "urlValue": "={{ $json.jobUrl }}"
+            },
+            {
+              "key": "Location|rich_text",
+              "textContent": "={{ $json.location }}"
+            },
+            {
+              "key": "Posted Date|date",
+              "date": "={{ $json.publishedAt }}"
+            },
+            {
+              "key": "Poster Linkedin URL|url",
+              "ignoreIfEmpty": true,
+              "urlValue": "={{ $json.posterProfileUrl }}"
+            },
+            {
+              "key": "Poster Name|rich_text",
+              "textContent": "={{ $json.posterFullName || \"Unknown\" }}"
+            },
+            {
+              "key": "Salary|rich_text",
+              "textContent": "={{ $json.salaryInfo[1] || \"TBD\" }}"
+            },
+            {
+              "key": "Status|status",
+              "statusValue": "Not started"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "bd294cb3-c386-4bc2-adf3-3eda0b31c8f0",
+      "name": "Add to Notion database",
+      "credentials": {
+        "notionApi": {
+          "id": "8W7fGjc0h1cJbiGi",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to trim long text to a preview (about 1500 characters)\nfunction createPreview(text, maxLength = 1500) {\n  if (!text) return \"\";\n  if (text.length <= maxLength) return text;\n  return text.slice(0, maxLength) + \"...\";\n}\n\n// Process all incoming items\nconst results = [];\n\nfor (const item of items) {\n  const data = item.json;\n  const fullDescription = data.jobDescription || \"\";\n\n  // Create shortened preview\n  const preview = createPreview(fullDescription);\n\n  // Keep all other data intact\n  results.push({\n    json: {\n      ...data,\n      jobDescriptionPreview: preview\n    }\n  });\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c7197778-d466-4e73-8bb1-9116cbf8fa03",
+      "name": "Job Description Shortener"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "28555c8e-c066-807f-80fd-fd062edbe9d8",
+          "mode": "list",
+          "cachedResultName": "Lucid Jobs Database",
+          "cachedResultUrl": "https://www.notion.so/28555c8ec066807f80fdfd062edbe9d8"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        -80
+      ],
+      "id": "887123e2-79dd-4f9a-a308-acf68660ebbc",
+      "name": "Get Jobs from Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "8W7fGjc0h1cJbiGi",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "28655c8e-c066-8060-83db-ff94ebed797e",
+          "mode": "list",
+          "cachedResultName": "Lucid Lead Database",
+          "cachedResultUrl": "https://www.notion.so/28655c8ec066806083dbff94ebed797e"
+        },
+        "title": "Lucid Lead Database",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Company|rich_text",
+              "textContent": "={{ $json.person.organization.name }}"
+            },
+            {
+              "key": "Company Website|url",
+              "urlValue": "={{ $json.person.organization.website_url }}"
+            },
+            {
+              "key": "Email|email",
+              "emailValue": "={{ $json.person.email }}"
+            },
+            {
+              "key": "First Name|title",
+              "title": "={{ $json.person.first_name }}"
+            },
+            {
+              "key": "Job Title|rich_text",
+              "textContent": "={{ $json.person.title }}"
+            },
+            {
+              "key": "Last Name|rich_text",
+              "textContent": "={{ $json.person.last_name }}"
+            },
+            {
+              "key": "Linkedin URL|url",
+              "urlValue": "={{ $json.person.linkedin_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2880,
+        -64
+      ],
+      "id": "bf53a5bb-e3a2-4486-bd74-60f4eb741aa9",
+      "name": "Add to Notion Lead Database",
+      "credentials": {
+        "notionApi": {
+          "id": "8W7fGjc0h1cJbiGi",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const people = $json.people; // from Apollo People Search\nconst jobLocation = $('Get Jobs from Notion').first().json.property_location || \"\";\n\n// Normalize job location (e.g. \"Atlanta, GA\" -> city & state)\nconst [jobCityRaw, jobStateRaw] = jobLocation.split(\",\").map(x => (x || \"\").trim().toLowerCase());\nconst jobCity = jobCityRaw || \"\";\nconst jobState = jobStateRaw ? jobStateRaw.replace(/\\./g, \"\") : \"\"; // remove period from \"GA.\"\n\n// Define weights for Lucid’s target roles\nconst titleScore = {\n  'director': 5,\n  'manager': 4,\n  'partner': 4,\n  'lead': 3,\n  'specialist': 2,\n  'associate': 1\n};\n\nconst keywords = [\n  'recruiting',\n  'talent',\n  'acquisition',\n  'hr',\n  'human resources',\n  'people',\n  'operations',\n  'project',\n  'staffing'\n];\n\nconst scored = people.map(p => {\n  const title = (p.title || \"\").toLowerCase();\n  const seniority = (p.seniority || \"\").toLowerCase();\n  const city = (p.city || \"\").toLowerCase();\n  const state = (p.state || \"\").toLowerCase();\n  \n  let score = 0;\n\n  // Title keyword match\n  if (keywords.some(k => title.includes(k))) score += 5;\n\n  // Add seniority weighting\n  Object.keys(titleScore).forEach(level => {\n    if (title.includes(level) || seniority.includes(level)) {\n      score += titleScore[level];\n    }\n  });\n\n  // Bonus for “Director”, “Manager”, “Partner” tier\n  if (['director', 'manager', 'partner', 'lead'].some(l => title.includes(l))) {\n    score += 2;\n  }\n\n  // 🟢 Location relevance scoring\n  if (jobCity && city.includes(jobCity)) score += 4;        // Same city\n  else if (jobState && state.includes(jobState)) score += 2; // Same state\n\n  return { ...p, relevanceScore: score };\n});\n\n// Sort descending by score and limit\nconst topPeople = scored.sort((a, b) => b.relevanceScore - a.relevanceScore).slice(0, 5);\n\nreturn topPeople.map(p => ({\n  json: {\n    name: p.name,\n    title: p.title,\n    seniority: p.seniority,\n    linkedin: p.linkedin_url,\n    city: p.city,\n    state: p.state,\n    relevanceScore: p.relevanceScore\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        -64
+      ],
+      "id": "d7816e17-ace0-40d8-ae1d-275717b77b49",
+      "name": "Filter Decision Makers"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "[go to api -> api endpoints in apify]",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"profileUrls\": [\n        \"{{ $json.property_linkedin_url }}\"\n    ]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4880,
+        0
+      ],
+      "id": "8863b05b-8689-43d1-8a7f-122cd3b2741c",
+      "name": "Linkedin Profile Scraping"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an elite Senior Psychographic Researcher and Strategic Communication Analyst for Lucid Group, a staffing and recruitment agency specializing in construction, engineering, and professional services.\n\nYour expertise combines organizational psychology, psycholinguistics, and sales communication strategy.\nYou analyze professional signals (education, work experience, skills, job titles, industry, writing tone, leadership style, career progression, and public achievements) to infer deep insights into a person’s psychological profile, values, and communication preferences.\n\nYou translate those insights into tactical cold email hooks and message angles that resonate with the person’s mindset, priorities, and worldview.\n\nYOUR OBJECTIVE\n\nGiven public information scraped from a prospect’s LinkedIn profile, produce:\n\nA psychological and communication profile of the person.\n\nPredicted motivators and personality drivers (what matters most to them).\n\nPreferred communication style — how they think, how they talk, and what persuades them.\n\nCold outreach hooks & angles for Lucid Group that would best engage this person — referencing the way they view success, risk, leadership, and results in their work.\n\nOUTPUT FORMAT\n\nReturn a markdown response.\n\nGUIDING PRINCIPLES\n\nNever hallucinate data. Base insights strictly on what can be inferred from the provided text and professional signals.\n\nTreat professional history as a window into cognitive style. For example:\n\nEngineers → precision, stability, logic.\n\nProject Managers → control, communication, trust, reliability.\n\nExecutives → achievement, strategy, influence, legacy.\n\nTailor all conclusions and outreach angles to Lucid Group’s mission: helping construction companies staff skilled, reliable talent faster and with less operational risk.\n\nKeep the tone grounded, human, and practical — avoid generic personality adjectives.\n\nEvery insight should answer: “How would this person want to be approached, spoken to, and convinced?”\n\n\nHere is the information about the person:\n\nFull Name: {{ $json.fullName }}\nAbout Section: {{ $json.about }}\nLinkedIn Headline: {{ $json.headline }}\nCurrent Job Title: {{ $json.jobTitle }}\nTop Skills by Endorsement: {{ $json.topSkillsByEndorsements }}\nCurrent Job Location: {{ $json.experiences[0].caption }}\nMost Recent Job Title: {{ $json.experiences[1].title }}\nMost Recent Employer: {{ $json.experiences[1].subtitle }}\nMost Recent Job Duration: {{ $json.experiences[1].caption }}\n\nCollege they attended: {{ $json.educations[0].title }}\nCollege Major: {{ $json.educations[0].subtitle }}\nReview that the person left for colleague: {{ $json.recommendations[1].section_components[0].subComponents[0].fixedListComponent[0].text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        5088,
+        0
+      ],
+      "id": "ec96c7a5-776c-40fa-abfe-82d7af0d119c",
+      "name": "AI Research Agent"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Get many database pages1').item.json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $json.chunk }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        5648,
+        0
+      ],
+      "id": "2778f4de-51e8-4d30-9caa-c069135e86b8",
+      "name": "Add to Notion CRM",
+      "credentials": {
+        "notionApi": {
+          "id": "8W7fGjc0h1cJbiGi",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get Jobs from Notion').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Done"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3088,
+        -64
+      ],
+      "id": "1e19b6ac-29bb-4b57-aee8-4d87fe21c78f",
+      "name": "Update a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "8W7fGjc0h1cJbiGi",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get many database pages1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        5856,
+        0
+      ],
+      "id": "0bd48529-3193-43a1-beeb-b5e26e4a66be",
+      "name": "Update a database page1",
+      "credentials": {
+        "notionApi": {
+          "id": "8W7fGjc0h1cJbiGi",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        192
+      ],
+      "id": "b5fd84b6-45c4-447e-9f75-90c52024324b",
+      "name": "Add to Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9uEZ5FhuEmdvMIf1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        -192
+      ],
+      "id": "c68d4f3c-6856-452d-95df-4f2ca966d3c9",
+      "name": "Add to Airtable"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Linkedin Job Scraper": {
+      "main": [
+        [
+          {
+            "node": "Job Description Shortener",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Apollo Organization Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo Organization Search": {
+      "main": [
+        [
+          {
+            "node": "Apollo People Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo People Search": {
+      "main": [
+        [
+          {
+            "node": "Filter Decision Makers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Add to Notion Lead Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Linkedin Profile Scraping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatting": {
+      "main": [
+        [
+          {
+            "node": "Add to Notion CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Linkedin Job Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Description Shortener": {
+      "main": [
+        [
+          {
+            "node": "Add to Notion database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Jobs from Notion": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Notion Lead Database": {
+      "main": [
+        [
+          {
+            "node": "Update a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Decision Makers": {
+      "main": [
+        [
+          {
+            "node": "Apollo Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Linkedin Profile Scraping": {
+      "main": [
+        [
+          {
+            "node": "AI Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Formatting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Notion CRM": {
+      "main": [
+        [
+          {
+            "node": "Update a database page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Notion database": {
+      "main": [
+        []
+      ]
+    },
+    "Add to Google Sheets": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "16448bd9-c5ac-403d-b8c8-d95a033cda8d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "162f93b0084d31a899385ee0965356c60b41fe5853dcd87efd89b524b9e9fd79"
+  },
+  "id": "ELBnCCLM1bCbI8iC",
+  "tags": []
+}
