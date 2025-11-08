@@ -10,9 +10,9 @@ Full video tutorial walkthrough here: https://youtu.be/DC8ftiBiP2c
 ## ⚙️ Overview
 
 **Workflow Purpose:**
-1. Scrape recent LinkedIn job postings with [Apify’s LinkedIn Job Scraper](https://apify.com/cheap_scraper/linkedin-job-scraper).
+1. Scrape recent LinkedIn job postings with [Apify’s LinkedIn Job Scraper](https://www.apify.com?fpr=92rji7).
 2. Store job data in Notion (company, role, location, date, salary).
-3. Look up the company in Apollo to find **key decision-makers** (HR, Talent, Ops, etc.).
+3. Look up the company in [Apollo](https://get.apollo.io/jaehke370bud) to find **key decision-makers** (HR, Talent, Ops, etc.).
 4. Enrich and rank those people by **relevance score** (title, seniority, and proximity).
 5. Use OpenAI (`gpt-5` or similar) to create a **psychological + communication profile** for outreach.
 6. Save all insights back into Notion CRM or a Google Sheet.
